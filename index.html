@@ -1,0 +1,238 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #ff0000, #000000);
+        }
+        .carousel {
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .carousel-item {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+        .rounded-border {
+            border-radius: 15px;
+        }
+        .profile-full {
+            border-radius: 50%;
+            width: 255px;
+            height: 285px;
+        }
+        .card {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .header-bg {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .typing-animation {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid;
+            animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: white; }
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4caf50;
+            width: 0;
+            transition: width 2s ease;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="font-roboto">
+    <div id="root"></div>
+    <script type="text/babel">
+        class Carousel extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    currentIndex: 0
+                };
+            }
+
+            componentDidMount() {
+                this.interval = setInterval(this.handleNext, 4000);
+            }
+
+            componentWillUnmount() {
+                clearInterval(this.interval);
+            }
+
+            handleNext = () => {
+                this.setState(prevState => ({
+                    currentIndex: (prevState.currentIndex === this.props.images.length - 1) ? 0 : prevState.currentIndex + 1
+                }));
+            }
+
+            render() {
+                const { images } = this.props;
+                const { currentIndex } = this.state;
+
+                return (
+                    <div className="carousel">
+                        <div className="carousel-inner" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+                            {images.map((image, index) => (
+                                <div className="carousel-item" key={index}>
+                                    <img src={image.src} alt={image.alt} className="w-3/4 h-auto mx-auto rounded-border"/>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        class SkillCard extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    showProgress: false
+                };
+            }
+
+            handleCardClick = () => {
+                this.setState({ showProgress: true }, () => {
+                    const progressBar = document.getElementById(`progress-bar-${this.props.skill}`);
+                    const progressText = document.getElementById(`progress-text-${this.props.skill}`);
+                    let width = 0;
+                    const interval = setInterval(() => {
+                        if (width >= this.props.percentage) {
+                            clearInterval(interval);
+                        } else {
+                            width++;
+                            progressBar.style.width = width + '%';
+                            progressText.innerText = width + '%';
+                        }
+                    }, 20);
+                });
+            }
+
+            render() {
+                return (
+                    <div className="bg-white p-4 rounded shadow card" onClick={this.handleCardClick}>
+                        <i className={`fab fa-${this.props.icon} fa-3x ${this.props.color}`}></i>
+                        <p className="mt-2">{this.props.skill}</p>
+                        {this.state.showProgress && (
+                            <div className="progress-container">
+                                <div id={`progress-bar-${this.props.skill}`} className="progress-bar"></div>
+                                <div id={`progress-text-${this.props.skill}`} className="text-center text-sm mt-1"></div>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+        }
+
+        const App = () => {
+            const images = [
+                { src: "https://i.ibb.co.com/DbhF6Bd/sertisatu.png", alt: "Screenshot of Certificate 1" },
+                { src: "https://i.ibb.co.com/hH0t57Y/sertidua.png", alt: "Screenshot of Certificate 2" }
+            ];
+
+            const projectImages = [
+                { src: "https://i.ibb.co.com/zr8HcFf/5.png", alt: "Screenshot of Project 1" },
+                { src: "https://i.ibb.co.com/dr5ZjrV/4.png", alt: "Screenshot of Project 2" },
+                { src: "https://i.ibb.co.com/X2G6m2P/3.png", alt: "Screenshot of Project 3" },
+                { src: "https://i.ibb.co.com/wZtwbYQ/1.png", alt: "Screenshot of Project 4" },
+                { src: "https://i.ibb.co.com/LdjKxNt/2.png", alt: "Screenshot of Project 5" }
+            ];
+
+            return (
+                <div className="container mx-auto p-4">
+                    <header className="text-center my-8 header-bg">
+                        <img src="https://i.ibb.co.com/dD4nYcw/09714.jpg" alt="Profile picture of Rizal Aldy" className="Profile-full mx-auto"/>
+                        <h1 className="text-4xl font-bold mt-4 text-white typing-animation">Welcome to Rizal Aldy's portfolio</h1>
+                        <p className="text-xl text-gray-300">Front End Developer</p>
+                        <div className="mt-4">
+                            <a href="https://github.com" className="text-gray-300 mx-2"><i className="fab fa-github fa-2x"></i></a>
+                            <a href="https://linkedin.com" className="text-gray-300 mx-2"><i className="fab fa-linkedin fa-2x"></i></a>
+                            <a href="https://instagram.com" className="text-gray-300 mx-2"><i className="fab fa-instagram fa-2x"></i></a>
+                        </div>
+                    </header>
+                    <section className="my-8">
+                        <h2 className="text-3xl font-bold mb-4 text-white">About Me</h2>
+                        <p className="text-gray-300">M Rizal Aldy M 17 tahun, siswa dari SMK WIKRAMA Bogor PPLG XI-4,sedang belajar untuk menjadi seorang Front End Developer.
+                            Saya memiliki pengetahuan tentang HTML, CSS, PHP dan JavaScript. </p>
+                    </section>
+                    <section className="my-8">
+                        <h2 className="text-3xl font-bold mb-4 text-white">Skills</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <SkillCard skill="JavaScript" icon="js-square" color="text-yellow-500" percentage={57} />
+                            <SkillCard skill="HTML" icon="html5" color="text-blue-500" percentage={95} />
+                            <SkillCard skill="PHP" icon="php" color="text-green-500" percentage={90} />
+                            <SkillCard skill="Python" icon="python" color="text-blue-500" percentage={55} />
+                        </div>
+                    </section>
+                    <section className="my-8">
+                        <h2 className="text-3xl font-bold mb-4 text-white">Certificates</h2>
+                        <Carousel images={images} />
+                    </section>
+                    <section className="my-8">
+                        <h2 className="text-3xl font-bold mb-4 text-white">Certificate Descriptions</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white p-4 rounded shadow card">
+                                <h3 className="text-xl font-bold">Certificate 1</h3>
+                                <p className="text-gray-700">Description of Certificate 1. sertifikat dicoding. mendapatkan sertifikat dengan membuat website sederhana menggunakan html, dan css</p>
+                            </div>
+                            <div className="bg-white p-4 rounded shadow card">
+                                <h3 className="text-xl font-bold">Certificate 2</h3>
+                                <p className="text-gray-700">Description of Certificate 2. sertifikat Unity. mendapatkan sertifikat dengan membuat fitur fitur game menggunakan unity</p>
+                            </div>
+                        </div>
+                    </section>
+                    <section className="my-8">
+                        <h2 className="text-3xl font-bold mb-4 text-white">Projects</h2>
+                        <Carousel images={projectImages} />
+                    </section>
+                    <section className="my-8 text-center">
+                        <h2 className="text-3xl font-bold mb-4 text-white">Contact Me</h2>
+                        <a href="https://wa.me/yourphonenumber" className="text-green-500 mx-2"><i className="fab fa-whatsapp fa-3x"></i></a>
+                    </section>
+                    <footer className="text-center my-8">
+                        <p className="text-white">Thank you for visiting Rizal Aldy's portfolio website.</p>
+                    </footer>
+                </div>
+            );
+        };
+        
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+</body>
+</html>
